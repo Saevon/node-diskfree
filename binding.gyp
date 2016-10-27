@@ -2,7 +2,10 @@
     "targets": [
         {
             "target_name": "diskfree",
-            "sources": ["disk-gyp.cpp", "disk.cpp"],
+            "sources": [
+                "./src/disk-gyp.cpp",
+                "./src/disk.cpp"
+            ],
         },
     ],
 }

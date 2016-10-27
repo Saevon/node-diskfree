@@ -1,5 +1,7 @@
+# node-diskfree
 
-This implements a shared interface to the unix-like and windows disk space readers.
+
+This implements a shared interface to the unix-like and windows disk space readers. It is implemented in C++ using the Node Addons API
 
 Unix runs on the [`statvfs`](https://linux.die.net/man/2/statvfs) systemcall
 Windows runs on the [`GetDiskFreeSpaceEx`](https://msdn.microsoft.com/en-us/library/windows/desktop/aa364937/) systemcall
@@ -12,6 +14,12 @@ Install with npm
 
 ```bash
 npm install disk-space
+```
+
+Install Locally
+
+```bash
+npm install Saevon/node-diskfree.git --save
 ```
 
 ## Usage
@@ -34,7 +42,9 @@ diskfree.check('C:', function onDiskInfo(error, info) {
 
     info.free == "Free Space";
     info.available == "User Available Space";
-    info.total == "Total Space"
+    info.total == "Total Space":
+    info.used == "Used Space";
+    info.locked == "OS locked";
 });
 ```
 
@@ -57,7 +67,9 @@ All space values are in bytes. If the value exceeds the maximum size of a double
 |-------------|----------|-----------------------|
 | free        | `Number` | Free space  |
 | available   | `Number` | User Available free space  |
+| used        | `Number` | Used space  |
 | total       | `Number` | Total space  |
+| locked      | `Number` | OS locked Space (Unavailable to user) |
 
 **`error`**
 
@@ -116,11 +128,6 @@ make
 Reminder: You need make on windows, in MingW you need to adds it binary path `/c/MingW/bin/mingw32-make.exe`
 
 
-## Installation
-
-```bash
-npm install git@github.com:Saevon/node-diskfree.js.git --save
-```
 
 ## License
 

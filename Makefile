@@ -2,14 +2,15 @@
 MODULE_NAME = diskfree
 
 # Build directories
+LIB_DIR = ./src
 BUILD_DIR = ./build
 TEST_DIR = ./test
 RELEASE_DIR = ${BUILD_DIR}/Release
 
 # Library Files
-BASE_HEADERS = os_detect.h disk.h
-BASE_LIB = disk.cpp
-NODE_LIB = disk-gyp.cpp ${BASE_LIB}
+BASE_HEADERS = ${LIB_DIR}/os_detect.h ${LIB_DIR}/disk.h
+BASE_LIB = ${LIB_DIR}/disk.cpp
+NODE_LIB = ${LIB_DIR}/disk-gyp.cpp ${BASE_LIB}
 TEST_LIB = ${TEST_DIR}/test.cpp
 
 # Test & Generated Files
@@ -67,7 +68,7 @@ build:
 
 # C++ Compilation
 ${BUILD_DIR}/${TEST_C_FILE}: ${TEST_LIB} ${BASE_LIB} ${BASE_HEADERS} ${BUILD_DIR}
-	${GCC} ${BASE_LIB} ${TEST_LIB} -I. -o $@
+	${GCC} ${BASE_LIB} ${TEST_LIB} -I${LIB_DIR} -o $@
 
 # Node Compilation
 ${RELEASE_DIR}/${NODE_MODULE}: ${NODE_LIB} ${BASE_HEADERS} ${BUILD_DIR}

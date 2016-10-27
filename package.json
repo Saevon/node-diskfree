@@ -1,0 +1,47 @@
+{
+    "name": "diskfree",
+    "version": "1.0.0",
+    "description": "Gets space available on a disk/directory. Node c++ extension that uses statvfs and GetFreeDriveSpaceEx, and provides proper errorcodes",
+
+
+    "license": "MIT",
+    "author": {
+        "name" : "Serghei Filippov",
+        "email" : "dot.saevon@gmail.com",
+        "url" : "blog.saevon.ca"
+    },
+
+    "keywords": [
+        "disk",
+        "usage",
+        "size",
+        "disk-size",
+        "df"
+    ],
+
+    "homepage": [
+        "https://github.com/Saevon/node-diskfree"
+    ],
+    "bugs": [
+        "https://github.com/Saevon/node-diskfree/issues"
+    ],
+
+
+    "main": "./build/Release/diskfree",
+    "directories": {
+        "lib": "src",
+        "test": "test"
+    },
+
+
+
+
+    "dependencies": {
+
+    },
+    "devDependencies": {
+        "node-gyp": "*"
+    },
+    "scripts":{
+    }
+}

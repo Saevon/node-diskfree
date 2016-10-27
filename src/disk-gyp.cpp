@@ -89,6 +89,8 @@ namespace diskfree {
             assignOverflowableUInt64(isolate, *diskInfo, "available", requestData->available);
             assignOverflowableUInt64(isolate, *diskInfo, "free", requestData->free);
             assignOverflowableUInt64(isolate, *diskInfo, "total", requestData->total);
+            assignOverflowableUInt64(isolate, *diskInfo, "used", (requestData->total - requestData->free));
+            assignOverflowableUInt64(isolate, *diskInfo, "locked", (requestData->free - requestData->available));
 
             // Setup return values
             argv[0] = Undefined(isolate);

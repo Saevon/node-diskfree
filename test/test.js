@@ -2,6 +2,7 @@ var assert = require('assert');
 
 var disk = require('../build/release/win32Diskspace');
 
+var first = false;
 
 disk.check("C:", (err, data) => {
     assert.equal(err, undefined, 'Error recieved reading drive "C:": ' + err);
@@ -13,8 +14,39 @@ disk.check("C:", (err, data) => {
     assert.ok(data.total >= data.free);
     assert.ok(data.total >= data.available);
     assert.ok(data.free >= data.available);
+
+    assert.ok(first, 'This function should be async');
+
+    console.log("Test1 Done");
 });
 
+// Mark that the main javascript thread is free
+first = true;
+
 disk.check("C", (err, data) => {
-    assert.ok(err == 3);
+    assert.equal(err, 3, 'Should be a Drive not Found Error Got(' + err + ')');
+
+    console.log("Test2 Done");
 });
+
+// Try all the error cases
+assert.throws(() => {
+    disk.check();
+}, TypeError);
+
+assert.throws(() => {
+    disk.check('C:');
+}, TypeError);
+
+assert.throws(() => {
+    disk.check(12, () => {});
+}, TypeError);
+
+assert.throws(() => {
+    disk.check('C:', 12);
+}, TypeError);
+
+assert.throws(() => {
+    disk.check(12, 12);
+}, TypeError);
+

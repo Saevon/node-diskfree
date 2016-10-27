@@ -14,6 +14,5 @@ uint64_t GetDiskSpace(const char *path, uint64_t *available, uint64_t *total, ui
 
     uint64_t error = GetLastError();
 
-
     return error;
 }

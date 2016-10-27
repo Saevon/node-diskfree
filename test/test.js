@@ -1,6 +1,11 @@
 var assert = require('assert');
 
-var disk = require('../build/Release/diskfree');
+var disk;
+try {
+    disk = require('diskfree');
+} catch (err) {
+    disk = require('../build/Release/diskfree');
+}
 
 var first = false;
 

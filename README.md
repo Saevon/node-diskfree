@@ -1,11 +1,36 @@
 
+This implements a shared interface to the unix-like and windows disk space readers.
+
+Unix runs on the [`statvfs`](https://linux.die.net/man/2/statvfs) systemcall
+Windows runs on the [`GetDiskFreeSpaceEx`](https://msdn.microsoft.com/en-us/library/windows/desktop/aa364937/) systemcall
+
+This utility will return the correct error number from the respective systemcall.
+
+## Installation
+
+Install with npm
+
+```bash
+npm install disk-space
+```
 
 ## Usage
 
 ```js
-var win32-diskspace = require('win32-diskspace');
-win32-diskspace.check('C:', function onDiskInfo(error, info) {
-    if (error) throw error;
+var diskspace = require('diskspace');
+diskspace.check('C:', function onDiskInfo(error, info) {
+    if (error) {
+    	// You can see if its a known error
+    	if (diskspace.isErrBadPath(err)) {
+    		throw new Error('Path is Wrong');
+    	} else if (diskspace.isErrDenied(error)) {
+    		throw new Error('Permission Denied');
+    	} else if (diskspace.isErrIO(error)) {
+    		throw new Error('IO Error');
+	    }
+
+    	throw new Error('Unknown error: ' + error);
+	}
 
     info.free == "Free Space";
     info.available == "User Available Space";
@@ -13,10 +38,9 @@ win32-diskspace.check('C:', function onDiskInfo(error, info) {
 });
 ```
 
+### diskspace.check(diskPath, callback):
 
-### win32-diskspace.check(diskPath, callback):
-
-Grabs disk information from windows using `GetDiskFreeSpaceEx`.
+Grabs disk space information
 
 **Arguments**
 
@@ -37,7 +61,31 @@ All space values are in bytes. If the value exceeds the maximum size of a double
 
 **`error`**
 
-Error will be `undefined` if the operation succeeds, otherwise check the windows [`System Error Codes`](https://msdn.microsoft.com/en-us/library/windows/desktop/ms681381) to find the problem (The link might change, but looking for `System Error Codes` in the windows docs should yield the codes).
+Error will be `undefined` if the operation succeeds, otherwise check the system error list to find the problem.
+
+Note that your specific system will might have its own error codes
+
+Windows [`System Error Codes`](https://msdn.microsoft.com/en-us/library/windows/desktop/ms681381)
+Unix-Like [`errno.h`](http://www.virtsync.com/c-error-codes-include-errno)
+
+
+### diskspace.isErrBadPath(error):
+
+Returns `true` if the errorcode is one of the windows/unix errorcodes that indicate the path was wrong.
+
+Note: this might only identify some pathing errors.
+
+### diskspace.isErrDenied(error):
+
+Returns `true` if the errorcode is one of the windows/unix errorcodes that indicate permission was denied
+
+Note: this might only identify some pathing errors.
+
+### diskspace.isErrDenied(error):
+
+Returns `true` if the errorcode is one of the windows/unix errorcodes that indicate there was an io error
+
+Note: this might only identify some pathing errors.
 
 
 
@@ -71,7 +119,7 @@ Reminder: You need make on windows, in MingW you need to adds it binary path `/c
 ## Installation
 
 ```bash
-npm install git@github.com:Saevon/node-win32-diskspace.js.git --save
+npm install git@github.com:Saevon/node-diskspace.js.git --save
 ```
 
 ## License

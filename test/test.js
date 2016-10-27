@@ -1,10 +1,15 @@
 var assert = require('assert');
 
-var disk = require('../build/release/win32Diskspace');
+var disk = require('../build/Release/diskspace');
 
 var first = false;
 
-disk.check("C:", (err, data) => {
+
+var isWin = /^win/.test(process.platform);
+var VALID_DRIVE = isWin ? 'C:' : '/';
+
+
+disk.check(VALID_DRIVE, (err, data) => {
     assert.equal(err, undefined, 'Error recieved reading drive "C:": ' + err);
 
     assert.ok(data.available);
@@ -17,16 +22,16 @@ disk.check("C:", (err, data) => {
 
     assert.ok(first, 'This function should be async');
 
-    console.log("Test1 Done");
+    console.log('Test1 Done');
 });
 
 // Mark that the main javascript thread is free
 first = true;
 
-disk.check("C", (err, data) => {
-    assert.equal(err, 3, 'Should be a Drive not Found Error Got(' + err + ')');
+disk.check('C', (err, data) => {
+    assert.ok(disk.isErrBadPath(err), 'Should be a Drive not Found Error Got(' + err + ')');
 
-    console.log("Test2 Done");
+    console.log('Test2 Done');
 });
 
 // Try all the error cases
@@ -35,18 +40,18 @@ assert.throws(() => {
 }, TypeError);
 
 assert.throws(() => {
-    disk.check('C:');
+    disk.check(VALID_DRIVE);
 }, TypeError);
 
 assert.throws(() => {
-    disk.check(12, () => {});
+    disk.check(1, () => {});
 }, TypeError);
 
 assert.throws(() => {
-    disk.check('C:', 12);
+    disk.check(VALID_DRIVE, 1);
 }, TypeError);
 
 assert.throws(() => {
-    disk.check(12, 12);
+    disk.check(1, 1);
 }, TypeError);
 

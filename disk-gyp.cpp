@@ -1,14 +1,16 @@
 #include <node.h>
-#include <v8.h>
 #include <uv.h>
+#include <v8.h>
 
-#include "disk.h"
 #include <cmath>
+#include <stdlib.h>
+#include <string.h>
+#include "disk.h"
 
 #define DBL_MAX 0xFFFFFFFFFFFFF800
 
 
-namespace win32Diskspace {
+namespace diskspace {
 
     using v8::FunctionCallbackInfo;
     using v8::Isolate;
@@ -55,11 +57,10 @@ namespace win32Diskspace {
         }
     }
 
-    void Worker(uv_work_t *request) {
+    void DiskSpaceWorker(uv_work_t *request) {
         reqData_t *requestData = reinterpret_cast<reqData_t *>(request->data);
 
         // Call the Inner Function
-        uint64_t available = 0, free = 0, total = 0;
         requestData->error = GetDiskSpace(
             requestData->diskPath,
             &(requestData->available),
@@ -68,7 +69,7 @@ namespace win32Diskspace {
          );
     }
 
-    void After(uv_work_t *request, int status) {
+    void AfterDiskSpaceWorker(uv_work_t *request, int status) {
         reqData_t *requestData = reinterpret_cast<reqData_t *>(request->data);
         Isolate *isolate = Isolate::GetCurrent();
         HandleScope handleScope(isolate);
@@ -127,7 +128,7 @@ namespace win32Diskspace {
         return true;
     }
 
-    void Method(const FunctionCallbackInfo<Value> &args) {
+    void DiskSpace(const FunctionCallbackInfo<Value> &args) {
         Isolate *isolate = args.GetIsolate();
 
         // Check the input args
@@ -153,16 +154,67 @@ namespace win32Diskspace {
         uv_work_t *request = new uv_work_t();
         request->data = requestData;
 
-        uv_queue_work(uv_default_loop(), request, &Worker, &After);
+        uv_queue_work(uv_default_loop(), request, &DiskSpaceWorker, &AfterDiskSpaceWorker);
 
         // Return to the parent early
         args.GetReturnValue().Set(Undefined(isolate));
     }
 
 
-    void init(Local<Object> exports) {
-        NODE_SET_METHOD(exports, "check", Method);
+
+    bool checkErrorcodeArgs(const FunctionCallbackInfo<Value> &args) {
+        Isolate *isolate = args.GetIsolate();
+
+        // Check the args
+        if (args.Length() != 1) {
+            isolate->ThrowException(Exception::TypeError(
+                String::NewFromUtf8(isolate, "errno is required")
+            ));
+            return false;
+        } else if (!args[0]->IsNumber()) {
+            isolate->ThrowException(Exception::TypeError(
+                String::NewFromUtf8(isolate, "errno should be a Number")
+            ));
+            return false;
+        }
+
+        return true;
     }
 
-    NODE_MODULE(win32Diskspace, init)
+    void checkErr(const FunctionCallbackInfo<Value> &args, diskErrFunc_t errChecker) {
+        // Check the input args
+        bool shouldRun = checkErrorcodeArgs(args);
+        if (!shouldRun) {
+            return;
+        }
+
+        // Get the args
+        double error = args[0]->ToNumber()->NumberValue();
+
+        // Convert to proper type
+        args.GetReturnValue().Set(
+            static_cast<double>(errChecker(static_cast<uint64_t>(error)))
+        );
+    }
+
+    void nodeIsErrDenied(const FunctionCallbackInfo<Value> &args) {
+        checkErr(args, isErrDenied);
+    }
+
+    void nodeIsErrBadPath(const FunctionCallbackInfo<Value> &args) {
+        checkErr(args, isErrBadPath);
+    }
+
+    void nodeIsErrIO(const FunctionCallbackInfo<Value> &args) {
+        checkErr(args, isErrIO);
+    }
+
+    void init(Local<Object> exports) {
+        NODE_SET_METHOD(exports, "check", DiskSpace);
+        NODE_SET_METHOD(exports, "isErrDenied", nodeIsErrDenied);
+        NODE_SET_METHOD(exports, "isErrBadPath", nodeIsErrBadPath);
+        NODE_SET_METHOD(exports, "isErrIO", nodeIsErrIO);
+    }
+
+    NODE_MODULE(diskspace, init)
 }

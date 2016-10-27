@@ -1,7 +1,7 @@
 {
     "targets": [
         {
-            "target_name": "win32Diskspace",
+            "target_name": "diskspace",
             "sources": ["disk-gyp.cpp", "disk.cpp"],
         },
     ],

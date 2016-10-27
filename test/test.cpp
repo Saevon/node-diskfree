@@ -1,9 +1,18 @@
-#include <windows.h>
 #include <stdio.h>
 #include "disk.h"
 #include <inttypes.h>
 #include <limits>
 #include <cfloat>
+
+#include "os_detect.h"
+
+#ifdef IS_WIN
+    #define VALID_PATH "C:"
+#endif
+#ifdef IS_UNIX
+    #define VALID_PATH "/"
+#endif
+
 
 
 void assertEqual(uint64_t value1, uint64_t value2, const char *message) {
@@ -11,7 +20,7 @@ void assertEqual(uint64_t value1, uint64_t value2, const char *message) {
         return;
     }
 
-    printf("%s: %i != %i\n", message, value1, value2);
+    printf("%s: %" PRIu64 " != %" PRIu64 "\n", message, value1, value2);
 }
 
 void assertTrue(bool result, const char *message) {
@@ -25,8 +34,8 @@ void assertTrue(bool result, const char *message) {
 int main(void) {
     uint64_t free, available, total;
     uint64_t err;
-    
-    err = GetDiskSpace("c:", &available, &total, &free);
+
+    err = GetDiskSpace(VALID_PATH, &available, &total, &free);
 
     assertEqual(err, 0, "error reading 'c:'");
     assertTrue(total > 0, "total disk space is wrong");
@@ -37,7 +46,11 @@ int main(void) {
 
     err = GetDiskSpace("c", &available, &total, &free);
 
-    assertEqual(err, 3, "no error reading invalid path");
+    assertTrue(isErrBadPath(err), "no error reading invalid path");
+
+    printf("avail: %" PRIu64 "\n", available);
+    printf("free : %" PRIu64 "\n", free);
+    printf("total: %" PRIu64 "\n", total);
 
     printf("Test Complete\n");
 

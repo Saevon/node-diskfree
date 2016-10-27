@@ -1,6 +1,6 @@
 var assert = require('assert');
 
-var disk = require('../build/Release/diskspace');
+var disk = require('../build/Release/diskfree');
 
 var first = false;
 

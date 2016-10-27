@@ -1,5 +1,5 @@
 # The name of the library
-MODULE_NAME = diskspace
+MODULE_NAME = diskfree
 
 # Build directories
 BUILD_DIR = ./build

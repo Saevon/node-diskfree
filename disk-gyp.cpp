@@ -10,7 +10,7 @@
 #define DBL_MAX 0xFFFFFFFFFFFFF800
 
 
-namespace diskspace {
+namespace diskfree {
 
     using v8::FunctionCallbackInfo;
     using v8::Isolate;
@@ -216,5 +216,5 @@ namespace diskspace {
         NODE_SET_METHOD(exports, "isErrIO", nodeIsErrIO);
     }
 
-    NODE_MODULE(diskspace, init)
+    NODE_MODULE(diskfree, init)
 }

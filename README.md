@@ -17,20 +17,20 @@ npm install disk-space
 ## Usage
 
 ```js
-var diskspace = require('diskspace');
-diskspace.check('C:', function onDiskInfo(error, info) {
+var diskfree = require('diskfree');
+diskfree.check('C:', function onDiskInfo(error, info) {
     if (error) {
-    	// You can see if its a known error
-    	if (diskspace.isErrBadPath(err)) {
-    		throw new Error('Path is Wrong');
-    	} else if (diskspace.isErrDenied(error)) {
-    		throw new Error('Permission Denied');
-    	} else if (diskspace.isErrIO(error)) {
-    		throw new Error('IO Error');
-	    }
+        // You can see if its a known error
+        if (diskfree.isErrBadPath(err)) {
+            throw new Error('Path is Wrong');
+        } else if (diskfree.isErrDenied(error)) {
+            throw new Error('Permission Denied');
+        } else if (diskfree.isErrIO(error)) {
+            throw new Error('IO Error');
+        }
 
-    	throw new Error('Unknown error: ' + error);
-	}
+        throw new Error('Unknown error: ' + error);
+    }
 
     info.free == "Free Space";
     info.available == "User Available Space";
@@ -38,7 +38,7 @@ diskspace.check('C:', function onDiskInfo(error, info) {
 });
 ```
 
-### diskspace.check(diskPath, callback):
+### diskfree.check(diskPath, callback):
 
 Grabs disk space information
 
@@ -69,19 +69,19 @@ Windows [`System Error Codes`](https://msdn.microsoft.com/en-us/library/windows/
 Unix-Like [`errno.h`](http://www.virtsync.com/c-error-codes-include-errno)
 
 
-### diskspace.isErrBadPath(error):
+### diskfree.isErrBadPath(error):
 
 Returns `true` if the errorcode is one of the windows/unix errorcodes that indicate the path was wrong.
 
 Note: this might only identify some pathing errors.
 
-### diskspace.isErrDenied(error):
+### diskfree.isErrDenied(error):
 
 Returns `true` if the errorcode is one of the windows/unix errorcodes that indicate permission was denied
 
 Note: this might only identify some pathing errors.
 
-### diskspace.isErrDenied(error):
+### diskfree.isErrDenied(error):
 
 Returns `true` if the errorcode is one of the windows/unix errorcodes that indicate there was an io error
 
@@ -119,7 +119,7 @@ Reminder: You need make on windows, in MingW you need to adds it binary path `/c
 ## Installation
 
 ```bash
-npm install git@github.com:Saevon/node-diskspace.js.git --save
+npm install git@github.com:Saevon/node-diskfree.js.git --save
 ```
 
 ## License

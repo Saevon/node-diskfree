@@ -52,14 +52,14 @@ diskfree.check('C:', function onDiskInfo(error, info) {
 
 Grabs disk space information
 
-**Arguments**
+#### Arguments
 
 | Name        | Type   | Description           |
 |-------------|--------|-----------------------|
 | diskPath   | `String`   | Directory to check  |
 | callback   | `function` | `callback(error, diskInfo)` |
 
-**`diskInfo`**
+##### `diskInfo`
 
 All space values are in bytes. If the value exceeds the maximum size of a double `0xFFFF FFFF FFFF F800` then this returns `Infinity`
 
@@ -71,7 +71,7 @@ All space values are in bytes. If the value exceeds the maximum size of a double
 | total       | `Number` | Total space  |
 | locked      | `Number` | OS locked Space (Unavailable to user) |
 
-**`error`**
+##### `error`
 
 Error will be `undefined` if the operation succeeds, otherwise check the system error list to find the problem.
 
@@ -91,13 +91,13 @@ Note: this might only identify some pathing errors.
 
 Returns `true` if the errorcode is one of the windows/unix errorcodes that indicate permission was denied
 
-Note: this might only identify some pathing errors.
+Note: this might only identify some permission errors.
 
-### diskfree.isErrDenied(error):
+### diskfree.isErrIO(error):
 
 Returns `true` if the errorcode is one of the windows/unix errorcodes that indicate there was an io error
 
-Note: this might only identify some pathing errors.
+Note: this might only identify some IO errors.
 
 
 
@@ -131,5 +131,5 @@ Reminder: You need make on windows, in MingW you need to adds it binary path `/c
 
 ## License
 
-[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/Saevon/bytes.js/blob/master/LICENSE)
+[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/Saevon/node-diskfree/blob/master/LICENSE)
 

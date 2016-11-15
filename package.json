@@ -1,6 +1,6 @@
 {
     "name": "diskfree",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Gets space available on a disk/directory. Node c++ extension that uses statvfs and GetFreeDriveSpaceEx, and provides proper errorcodes",
 
 

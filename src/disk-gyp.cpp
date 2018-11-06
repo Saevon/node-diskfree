@@ -184,6 +184,8 @@ namespace diskfree {
     }
 
     void checkErr(const FunctionCallbackInfo<Value> &args, diskErrFunc_t errChecker) {
+        Isolate *isolate = args.GetIsolate();
+
         // Check the input args
         bool shouldRun = checkErrorcodeArgs(args);
         if (!shouldRun) {
@@ -191,7 +193,7 @@ namespace diskfree {
         }
 
         // Get the args
-        double error = args[0]->ToNumber()->NumberValue();
+        double error = args[0]->ToNumber(isolate)->NumberValue();
 
         // Convert to proper type
         args.GetReturnValue().Set(

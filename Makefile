@@ -40,7 +40,7 @@ help:
 	@echo "test-c    Runs the pure c++ tests"
 	@echo "test-js   Runs the pure full node tests"
 
-.PHONY:
+.PHONY: clean
 clean:
 	rm -rf ${BUILD_DIR}
 

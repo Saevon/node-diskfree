@@ -34,14 +34,12 @@
     },
 
 
-
-
     "dependencies": {
 
     },
     "devDependencies": {
         "node-gyp": "*"
     },
-    "scripts":{
+    "scripts": {
     }
 }

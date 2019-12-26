@@ -9,12 +9,15 @@
 
 #define DBL_MAX 0xFFFFFFFFFFFFF800
 
+#define ignore_return (void)
+
 
 namespace diskfree {
 
     using v8::FunctionCallbackInfo;
     using v8::Isolate;
     using v8::HandleScope;
+    using v8::Context;
 
     using v8::Local;
     using v8::Persistent;
@@ -28,6 +31,7 @@ namespace diskfree {
     using v8::String;
     using v8::Number;
     using v8::Function;
+    using v8::NewStringType;
 
     struct reqData_t {
         // v8 Worker requirements
@@ -48,10 +52,15 @@ namespace diskfree {
     void assignOverflowableUInt64(Isolate *isolate, Object *obj, const char *key, uint64_t val) {
         // Check for Overflows
         if (val > DBL_MAX) {
-            obj->Set(String::NewFromUtf8(isolate, key), Number::New(isolate, INFINITY));
+            obj->Set(
+                isolate->GetCurrentContext(),
+                String::NewFromUtf8(isolate, key, NewStringType::kNormal).ToLocalChecked(),
+                Number::New(isolate, INFINITY)
+            );
         } else {
             obj->Set(
-                String::NewFromUtf8(isolate, key),
+                isolate->GetCurrentContext(),
+                String::NewFromUtf8(isolate, key, NewStringType::kNormal).ToLocalChecked(),
                 Number::New(isolate, static_cast<double>(val))
             );
         }
@@ -97,7 +106,12 @@ namespace diskfree {
             argv[1] = diskInfo;
         }
 
-        Local<Function>::New(isolate, requestData->callback)->Call(isolate->GetCurrentContext()->Global(), argc, argv);
+        ignore_return Local<Function>::New(isolate, requestData->callback)->Call(
+            isolate->GetCurrentContext(),
+            Null(isolate),
+            argc,
+            argv
+        );
 
         // Cleanup
         requestData->callback.Reset();
@@ -112,17 +126,17 @@ namespace diskfree {
         // Check the args
         if (args.Length() != 2) {
             isolate->ThrowException(Exception::TypeError(
-                String::NewFromUtf8(isolate, "diskPath and callback are required")
+                String::NewFromUtf8(isolate, "diskPath and callback are required", NewStringType::kNormal).ToLocalChecked()
             ));
             return false;
         } else if (!args[0]->IsString()) {
             isolate->ThrowException(Exception::TypeError(
-                String::NewFromUtf8(isolate, "diskPath should be a string")
+                String::NewFromUtf8(isolate, "diskPath should be a string", NewStringType::kNormal).ToLocalChecked()
             ));
             return false;
         } else if (!args[1]->IsFunction()) {
             isolate->ThrowException(Exception::TypeError(
-                String::NewFromUtf8(isolate, "diskPath should be a function")
+                String::NewFromUtf8(isolate, "diskPath should be a function", NewStringType::kNormal).ToLocalChecked()
             ));
             return false;
         }
@@ -140,7 +154,7 @@ namespace diskfree {
         }
 
         // Get the Args
-        String::Utf8Value diskPath(args[0]);
+        String::Utf8Value diskPath(isolate, args[0]);
         Local<Function> callback = Local<Function>::Cast(args[1]);
 
         // Copy the string into a C String (+1 or the null char)
@@ -170,12 +184,12 @@ namespace diskfree {
         // Check the args
         if (args.Length() != 1) {
             isolate->ThrowException(Exception::TypeError(
-                String::NewFromUtf8(isolate, "errno is required")
+                String::NewFromUtf8(isolate, "errno is required", NewStringType::kNormal).ToLocalChecked()
             ));
             return false;
         } else if (!args[0]->IsNumber()) {
             isolate->ThrowException(Exception::TypeError(
-                String::NewFromUtf8(isolate, "errno should be a Number")
+                String::NewFromUtf8(isolate, "errno should be a Number", NewStringType::kNormal).ToLocalChecked()
             ));
             return false;
         }
@@ -185,6 +199,7 @@ namespace diskfree {
 
     void checkErr(const FunctionCallbackInfo<Value> &args, diskErrFunc_t errChecker) {
         Isolate *isolate = args.GetIsolate();
+        Local<Context> context = isolate->GetCurrentContext();
 
         // Check the input args
         bool shouldRun = checkErrorcodeArgs(args);
@@ -193,7 +208,12 @@ namespace diskfree {
         }
 
         // Get the args
-        double error = args[0]->ToNumber(isolate)->NumberValue();
+        double error;
+        if (args[0]->IsUndefined()) {
+            error = 0;
+        } else {
+            error = args[0]->NumberValue(context).FromMaybe(0);
+        }
 
         // Convert to proper type
         args.GetReturnValue().Set(

@@ -13,3 +13,7 @@ Primary version
 ## 1.0.2
 
  * Fixes dev-code that was published
+
+## 1.2.0
+
+ * Updated to support Node 12, 13
